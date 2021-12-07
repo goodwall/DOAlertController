@@ -159,9 +159,9 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     // AlertView
     open var alertView = UIView()
     open var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
-    fileprivate var alertViewWidth: CGFloat = 270.0
+    fileprivate var alertViewWidth: CGFloat = 280.0
     fileprivate var alertViewHeightConstraint: NSLayoutConstraint?
-    fileprivate var alertViewPadding: CGFloat = 15.0
+    fileprivate var alertViewPadding: CGFloat = 20.0
     fileprivate var innerContentWidth: CGFloat = 240.0
     fileprivate let actionSheetBounceHeight: CGFloat = 20.0
     
@@ -207,7 +207,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     // ButtonContainer
     fileprivate var buttonContainer = UIView()
     fileprivate var buttonContainerHeightConstraint: NSLayoutConstraint?
-    fileprivate let buttonHeight: CGFloat = 44.0
+    fileprivate let buttonHeight: CGFloat = 32.0
     fileprivate var buttonMargin: CGFloat = 10.0
     
     // Actions
@@ -235,7 +235,12 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         .cancel  : UIColor(red:140/255, green:152/255, blue:153/255, alpha:1),
         .destructive  : UIColor(red:234/255, green:97/255, blue:83/255, alpha:1)
     ]
-    fileprivate var buttonCornerRadius: CGFloat = 4.0
+    open var buttonBorderColor: [DOAlertActionStyle : UIColor] = [
+        .default : UIColor(red:52/255, green:152/255, blue:219/255, alpha:1),
+        .cancel  : UIColor(red:127/255, green:140/255, blue:141/255, alpha:1),
+        .destructive  : UIColor(red:231/255, green:76/255, blue:60/255, alpha:1)
+    ]
+    fileprivate var buttonCornerRadius: CGFloat = 8.0
     
     fileprivate var layoutFlg = false
     fileprivate var keyboardHeight: CGFloat = 0.0
@@ -254,9 +259,24 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         self.modalPresentationStyle = UIModalPresentationStyle.custom
         
         // NotificationCenter
-        NotificationCenter.default.addObserver(self, selector: #selector(DOAlertController.handleAlertActionEnabledDidChangeNotification(_:)), name: NSNotification.Name(rawValue: DOAlertActionEnabledDidChangeNotification), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(DOAlertController.handleKeyboardWillShowNotification(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(DOAlertController.handleKeyboardWillHideNotification(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(DOAlertController.handleAlertActionEnabledDidChangeNotification(_:)),
+            name: NSNotification.Name(rawValue: DOAlertActionEnabledDidChangeNotification),
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(DOAlertController.handleKeyboardWillShowNotification(_:)),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(DOAlertController.handleKeyboardWillHideNotification(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
         
         // Delegate
         self.transitioningDelegate = self
@@ -272,10 +292,6 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func currentOrientation() -> UIInterfaceOrientation {
-        return UIScreen.main.bounds.size.width < UIScreen.main.bounds.size.height ? .portrait : .landscapeLeft
     }
     
     override open func viewWillAppear(_ animated: Bool) {
@@ -303,11 +319,6 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         
         // Screen Size
         var screenSize = presenting != nil ? presenting!.view.bounds.size : UIScreen.main.bounds.size
-        if ((UIDevice.current.systemVersion as NSString).floatValue < 8.0) {
-            if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
-                screenSize = CGSize(width: screenSize.height, height: screenSize.width)
-            }
-        }
         
         // variable for ActionSheet
         if (!isAlert()) {
@@ -315,7 +326,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
             alertViewPadding = 8.0
             innerContentWidth = (screenSize.height > screenSize.width) ? screenSize.width - alertViewPadding * 2 : screenSize.height - alertViewPadding * 2
             buttonMargin = 8.0
-            buttonCornerRadius = 6.0
+            buttonCornerRadius = 8.0
         }
         
         // self.view
@@ -449,6 +460,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         //------------------------------
         overlayView.backgroundColor = overlayColor
         alertView.backgroundColor = alertViewBgColor
+        alertView.layer.cornerRadius = 8
         
         //------------------------------
         // TextArea Layout
@@ -534,8 +546,10 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
             for button in buttons {
                 let action = actions[button.tag - 1] as! DOAlertAction
                 button.titleLabel?.font = buttonFont[action.style]
-                button.setTitleColor(buttonTextColor[action.style], for: UIControlState())
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: UIControlState())
+                button.setTitleColor(buttonTextColor[action.style], for: .normal)
+                button.layer.borderColor = buttonBorderColor[action.style]?.cgColor
+                button.layer.borderWidth = 2
+                button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: .normal)
                 button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .highlighted)
                 button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .selected)
                 button.frame = CGRect(x: buttonPositionX, y: buttonAreaPositionY, width: buttonWidth, height: buttonHeight)
@@ -547,8 +561,10 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
                 let action = actions[button.tag - 1] as! DOAlertAction
                 if (action.style != DOAlertActionStyle.cancel) {
                     button.titleLabel?.font = buttonFont[action.style]
-                    button.setTitleColor(buttonTextColor[action.style], for: UIControlState())
-                    button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: UIControlState())
+                    button.setTitleColor(buttonTextColor[action.style], for: .normal)
+                    button.layer.borderColor = buttonBorderColor[action.style]?.cgColor
+                    button.layer.borderWidth = 2
+                    button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: .normal)
                     button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .highlighted)
                     button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .selected)
                     button.frame = CGRect(x: 0, y: buttonAreaPositionY, width: innerContentWidth, height: buttonHeight)
@@ -566,8 +582,10 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
                 let button = buttonAreaScrollView.viewWithTag(cancelButtonTag) as! UIButton
                 let action = actions[cancelButtonTag - 1] as! DOAlertAction
                 button.titleLabel?.font = buttonFont[action.style]
-                button.setTitleColor(buttonTextColor[action.style], for: UIControlState())
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: UIControlState())
+                button.setTitleColor(buttonTextColor[action.style], for: .normal)
+                button.layer.borderColor = buttonBorderColor[action.style]?.cgColor
+                button.layer.borderWidth = 2
+                button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: .normal)
                 button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .highlighted)
                 button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .selected)
                 button.frame = CGRect(x: 0, y: buttonAreaPositionY, width: innerContentWidth, height: buttonHeight)
@@ -598,11 +616,6 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     func reloadAlertViewHeight() {
         
         var screenSize = self.presentingViewController != nil ? self.presentingViewController!.view.bounds.size : UIScreen.main.bounds.size
-        if ((UIDevice.current.systemVersion as NSString).floatValue < 8.0) {
-            if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
-                screenSize = CGSize(width: screenSize.height, height: screenSize.width)
-            }
-        }
         let maxHeight = screenSize.height - keyboardHeight
         
         // for avoiding constraint error
@@ -627,7 +640,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     }
     
     // Button Tapped Action
-    func buttonTapped(_ sender: UIButton) {
+    @objc func buttonTapped(_ sender: UIButton) {
         sender.isSelected = true
         let action = actions[sender.tag - 1] as! DOAlertAction
         if (action.handler != nil) {
@@ -637,7 +650,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     }
     
     // Handle ContainerView tap gesture
-    func handleContainerViewTapGesture(_ sender: AnyObject) {
+    @objc func handleContainerViewTapGesture(_ sender: AnyObject) {
         // cancel action
         let action = actions[cancelButtonTag - 1] as! DOAlertAction
         if (action.handler != nil) {
@@ -662,19 +675,14 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     
     @objc func handleAlertActionEnabledDidChangeNotification(_ notification: Notification) {
         for i in 0..<buttons.count {
-            buttons[i].isEnabled = actions[i].enabled
+            buttons[i].isEnabled = actions[i].isEnabled
         }
     }
     
-    func handleKeyboardWillShowNotification(_ notification: Notification) {
+    @objc func handleKeyboardWillShowNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo as? [String: NSValue],
-            let keyboardSize = userInfo[UIKeyboardFrameEndUserInfoKey]?.cgRectValue.size {
+           let keyboardSize = userInfo[UIResponder.keyboardFrameEndUserInfoKey]?.cgRectValue.size {
             var _keyboardSize = keyboardSize
-            if ((UIDevice.current.systemVersion as NSString).floatValue < 8.0) {
-                if (UIInterfaceOrientationIsLandscape(currentOrientation())) {
-                    _keyboardSize = CGSize(width: _keyboardSize.height, height: _keyboardSize.width)
-                }
-            }
             keyboardHeight = _keyboardSize.height
             reloadAlertViewHeight()
             containerViewBottomSpaceConstraint?.constant = -keyboardHeight
@@ -684,7 +692,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         }
     }
     
-    func handleKeyboardWillHideNotification(_ notification: Notification) {
+    @objc func handleKeyboardWillHideNotification(_ notification: Notification) {
         keyboardHeight = 0.0
         reloadAlertViewHeight()
         containerViewBottomSpaceConstraint?.constant = keyboardHeight
@@ -713,7 +721,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         // Add Button
         let button = UIButton()
         button.layer.masksToBounds = true
-        button.setTitle(action.title, for: UIControlState())
+        button.setTitle(action.title, for: .normal)
         button.isEnabled = action.enabled
         button.layer.cornerRadius = buttonCornerRadius
         button.addTarget(self, action: #selector(DOAlertController.buttonTapped(_:)), for: .touchUpInside)
@@ -737,7 +745,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         
         let textField = UITextField()
         textField.frame.size = CGSize(width: innerContentWidth, height: textFieldHeight)
-        textField.borderStyle = UITextBorderStyle.none
+        textField.borderStyle = .none
         textField.backgroundColor = textFieldBgColor
         textField.delegate = self
         
