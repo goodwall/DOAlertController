@@ -147,6 +147,9 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
 
     // Attributed message
     open var attributedMessage: NSAttributedString?
+
+    // Dismiss on tap on container view
+    open var dismissWhenTapOutside: Bool = false
     
     // AlertController Style
     fileprivate(set) var preferredStyle: DOAlertControllerStyle?
@@ -305,7 +308,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if (!isAlert() && cancelButtonTag != 0) {
+        if (!isAlert() && cancelButtonTag != 0) || dismissWhenTapOutside {
             let tapGesture = UITapGestureRecognizer(target: self, action: #selector(DOAlertController.handleContainerViewTapGesture(_:)))
             containerView.addGestureRecognizer(tapGesture)
         }
@@ -662,9 +665,9 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     // Handle ContainerView tap gesture
     @objc func handleContainerViewTapGesture(_ sender: AnyObject) {
         // cancel action
-        let action = actions[cancelButtonTag - 1] as! DOAlertAction
-        if (action.handler != nil) {
-            action.handler(action)
+        let index = cancelButtonTag - 1
+        if actions.indices.contains(index), let action = actions[index] as? DOAlertAction {
+            action.handler?(action)
         }
         self.dismiss(animated: true, completion: nil)
     }
