@@ -165,10 +165,10 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     // AlertView
     open var alertView = UIView()
     open var alertViewBgColor = UIColor(red:239/255, green:240/255, blue:242/255, alpha:1.0)
-    fileprivate var alertViewWidth: CGFloat = 280.0
+    fileprivate var alertViewWidth: CGFloat = 260.0
     fileprivate var alertViewHeightConstraint: NSLayoutConstraint?
     fileprivate var alertViewPadding: CGFloat = 20.0
-    fileprivate var innerContentWidth: CGFloat = 240.0
+    fileprivate var innerContentWidth: CGFloat = 210.0
     fileprivate let actionSheetBounceHeight: CGFloat = 20.0
     
     // TextAreaScrollView
@@ -490,7 +490,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
             titleLabel.sizeToFit()
             titleLabel.frame = CGRect(x: 0, y: textAreaPositionY, width: innerContentWidth, height: titleLabel.frame.height)
             textContainer.addSubview(titleLabel)
-            textAreaPositionY += titleLabel.frame.height + 5.0
+            textAreaPositionY += titleLabel.frame.height + 10.0
         }
         
         // MessageView
@@ -510,7 +510,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
             messageView.sizeToFit()
             messageView.frame = CGRect(x: 0, y: textAreaPositionY, width: innerContentWidth, height: messageView.frame.height)
             textContainer.addSubview(messageView)
-            textAreaPositionY += messageView.frame.height + 5.0
+            textAreaPositionY += messageView.frame.height + 10.0
         }
         
         // TextFieldContainerView
