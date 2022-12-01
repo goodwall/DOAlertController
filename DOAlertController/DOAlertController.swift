@@ -151,6 +151,9 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
     // Dismiss on tap on container view
     open var dismissWhenTapOutside: Bool = false
     
+    // If alert has 2 buttons, display it vertically (default is horizontal)
+    open var forceVerticalButtons: Bool = false
+    
     // AlertController Style
     fileprivate(set) var preferredStyle: DOAlertControllerStyle?
     
@@ -553,7 +556,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         var buttonAreaPositionY: CGFloat = buttonMargin
         
         // Buttons
-        if (isAlert() && buttons.count == 2) {
+        if (isAlert() && buttons.count == 2 && !self.forceVerticalButtons) {
             let buttonWidth = (innerContentWidth - buttonMargin) / 2
             var buttonPositionX: CGFloat = 0.0
             for button in buttons {
