@@ -249,8 +249,8 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         .cancel  : UIColor(red:127/255, green:140/255, blue:141/255, alpha:1),
         .destructive  : UIColor(red:231/255, green:76/255, blue:60/255, alpha:1)
     ]
-    fileprivate var buttonCornerRadius: CGFloat = 8.0
-    
+    open var buttonCornerRadius: CGFloat = 16.0
+
     fileprivate var layoutFlg = false
     fileprivate var keyboardHeight: CGFloat = 0.0
     fileprivate var cancelButtonTag = 0
@@ -565,9 +565,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
                 button.setTitleColor(buttonTextColor[action.style], for: .normal)
                 button.layer.borderColor = buttonBorderColor[action.style]?.cgColor
                 button.layer.borderWidth = 2
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: .normal)
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .highlighted)
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .selected)
+                button.backgroundColor = buttonBgColor[action.style]
                 button.frame = CGRect(x: buttonPositionX, y: buttonAreaPositionY, width: buttonWidth, height: buttonHeight)
                 buttonPositionX += buttonMargin + buttonWidth
             }
@@ -580,9 +578,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
                     button.setTitleColor(buttonTextColor[action.style], for: .normal)
                     button.layer.borderColor = buttonBorderColor[action.style]?.cgColor
                     button.layer.borderWidth = 2
-                    button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: .normal)
-                    button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .highlighted)
-                    button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .selected)
+                    button.backgroundColor = buttonBgColor[action.style]
                     button.frame = CGRect(x: 0, y: buttonAreaPositionY, width: innerContentWidth, height: buttonHeight)
                     buttonAreaPositionY += buttonHeight + buttonMargin
                 } else {
@@ -601,9 +597,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
                 button.setTitleColor(buttonTextColor[action.style], for: .normal)
                 button.layer.borderColor = buttonBorderColor[action.style]?.cgColor
                 button.layer.borderWidth = 2
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColor[action.style]!), for: .normal)
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .highlighted)
-                button.setBackgroundImage(createImageFromUIColor(buttonBgColorHighlighted[action.style]!), for: .selected)
+                button.backgroundColor = buttonBgColor[action.style]
                 button.frame = CGRect(x: 0, y: buttonAreaPositionY, width: innerContentWidth, height: buttonHeight)
                 buttonAreaPositionY += buttonHeight + buttonMargin
             }
