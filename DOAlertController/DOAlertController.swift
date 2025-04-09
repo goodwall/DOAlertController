@@ -470,7 +470,7 @@ open class DOAlertController : UIViewController, UITextFieldDelegate, UIViewCont
         //------------------------------
         overlayView.backgroundColor = overlayColor
         alertView.backgroundColor = alertViewBgColor
-        alertView.layer.cornerRadius = 8
+        alertView.layer.cornerRadius = 16
         
         //------------------------------
         // TextArea Layout
